@@ -1,0 +1,19 @@
+# Environment
+.env
+venv/
+__pycache__/
+*.pyc
+
+# Crawler data
+crawler_data/
+
+# Working reference (instructor only)
+/crawler/
+/run.py
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
