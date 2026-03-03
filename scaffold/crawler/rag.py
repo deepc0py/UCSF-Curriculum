@@ -34,6 +34,7 @@ class CrawlerRAG:
         self,
         collection_name: str = "crawler_findings",
         persist_dir: str | None = None,
+        use_reranker: bool = False,
     ):
         """
         Initialize the vector store.
@@ -42,10 +43,15 @@ class CrawlerRAG:
             collection_name: Name for the ChromaDB collection.
             persist_dir:     If provided, store data on disk at this path.
                              If None, use an in-memory database (lost on exit).
+            use_reranker:    If True, use a cross-encoder (FlashRank) to
+                             rerank search results. Two-stage retrieval:
+                             1. Retrieve broadly with cosine similarity (3x candidates)
+                             2. Rerank precisely with a cross-encoder (return top N)
 
         Setup:
             - Create a chromadb.Client() or PersistentClient()
             - Call get_or_create_collection() with cosine distance metric
+            - Store use_reranker flag and initialize _ranker = None (lazy init)
         """
         raise NotImplementedError("Meeting 4")
 
@@ -92,6 +98,25 @@ class CrawlerRAG:
             List of dicts with content, source_url, tags, distance.
         """
         raise NotImplementedError("Meeting 4")
+
+    def _rerank(self, query: str, findings: list[dict], top_n: int) -> list[dict]:
+        """
+        Stretch goal: Rerank findings using a cross-encoder model (FlashRank).
+
+        This scores each (query, document) pair jointly — much more accurate
+        than comparing two embeddings independently via cosine similarity.
+
+        Steps:
+            1. Import and initialize flashrank.Ranker (lazy, via self._get_ranker())
+            2. Build passage dicts: [{"id": i, "text": finding["content"]}, ...]
+            3. Create a RerankRequest(query=query, passages=passages)
+            4. Call ranker.rerank(request)
+            5. Sort by score descending, take top_n
+            6. Add "rerank_score" to each finding dict
+
+        See: https://github.com/PrithivirajDamodaran/FlashRank
+        """
+        raise NotImplementedError("Meeting 4 stretch")
 
     def count(self) -> int:
         """Return the number of stored findings."""
